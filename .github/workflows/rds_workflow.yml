@@ -3,7 +3,8 @@ name: "RDS Terraform workflow"
 on:
   push:
     branches:
-      - main
+      - rds
+  workflow_dispatch:
 
 jobs:
   terraform:
