@@ -1,9 +1,10 @@
-name: "RDS Terraform workflow"
+name: 'RDS Terraform workflow'
 
 on:
   push:
     branches:
-      - rds
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -15,7 +16,7 @@ jobs:
         shell: bash
 
     steps:
-      - name: Checkout code 
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Terraform
@@ -29,13 +30,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: "us-east-1"
-      
+          aws-region: 'us-east-1'
+
       - name: Terraform Init
         run: |
           cd RDS
           terraform init -backend-config="bucket=${{ secrets.TERRAFORM_BUCKET }}" -backend-config="dynamodb_table=terraform-cicd-lock"
-        
+
       - name: Terraform Validate
         run: |
           cd RDS
@@ -51,6 +52,5 @@ jobs:
           TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
-          TF_VAR_vpc_security_group_ids: ${{ secrets.VPC_SECURITY_GROUP_IDS }}  
-          TF_VAR_db_subnet_group_name: ${{ secrets.DB_SUBNET_GROUP_NAME }} 
-      
+          TF_VAR_vpc_security_group_ids: ${{ secrets.VPC_SECURITY_GROUP_IDS }}
+          TF_VAR_db_subnet_group_name: ${{ secrets.DB_SUBNET_GROUP_NAME }}
