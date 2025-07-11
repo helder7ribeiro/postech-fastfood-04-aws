@@ -1,59 +1,68 @@
-# FastFood - Infraestrutura AWS
+# Postech FastFood 04 - AWS
 
-Este projeto contém a infraestrutura Terraform para o sistema FastFood na AWS.
+Projeto de infraestrutura como código para o sistema FastFood na AWS.
 
 ## Estrutura do Projeto
 
-```
-├── RDS/                    # Módulo para recursos de banco de dados
-│   ├── main.tf            # Recursos RDS principais
-│   ├── variables.tf       # Variáveis do módulo
-│   ├── provider.tf        # Configuração do provider AWS
-│   ├── backend.tf         # Configuração do backend S3
-│   └── README.md          # Documentação do módulo
-├── .github/               # Configurações do GitHub
-└── README.md              # Este arquivo
-```
+O projeto está organizado em dois módulos principais:
 
-## Módulos Disponíveis
+### EKS (Elastic Kubernetes Service)
+- **Localização**: `EKS/`
+- **Descrição**: Configuração do cluster Kubernetes na AWS
+- **Arquivos principais**:
+  - `main.tf` - Recursos do EKS
+  - `variables.tf` - Variáveis de configuração
+  - `backend.tf` - Configuração do backend do Terraform
 
-### RDS
+### RDS (Relational Database Service)
 - **Localização**: `RDS/`
-- **Descrição**: Provisiona instância PostgreSQL RDS
-- **Documentação**: [RDS/README.md](RDS/README.md)
+- **Descrição**: Configuração do banco de dados PostgreSQL
+- **Arquivos principais**:
+  - `main.tf` - Recursos do RDS
+  - `variables.tf` - Variáveis de configuração
+  - `backend.tf` - Configuração do backend do Terraform
 
-## Próximos Módulos Planejados
+## Workflows
 
-- **EC2**: Instâncias para aplicação
-- **VPC**: Rede e subnets
-- **Security Groups**: Regras de segurança
-- **Load Balancer**: Balanceador de carga
-- **S3**: Armazenamento de objetos
+### Workflow EKS
+- **Arquivo**: `.github/workflows/eks-deploy.yml`
+- **Função**: Deploy automático do cluster EKS
+- **Trigger**: Push para branch `main` em diretório `EKS/`
 
-## Como Usar
+### Workflow RDS
+- **Arquivo**: `.github/workflows/rds-deploy.yml`
+- **Função**: Deploy automático do banco RDS
+- **Trigger**: Push para branch `main` em diretório `RDS/`
 
-1. Navegue para o módulo desejado:
-   ```bash
-   cd RDS
-   ```
+## Secrets Necessárias
 
-2. Inicialize o Terraform:
-   ```bash
-   terraform init
-   ```
+Para que os workflows funcionem corretamente, as seguintes secrets devem ser configuradas no repositório GitHub:
 
-3. Planeje as mudanças:
-   ```bash
-   terraform plan
-   ```
+### AWS Credentials
+- `AWS_ACCESS_KEY_ID` - Access Key ID da AWS
+- `AWS_SECRET_ACCESS_KEY` - Secret Access Key da AWS
+- `AWS_SESSION_TOKEN` - Session Token da AWS (necessário para AWS Academy)
+- `AWS_REGION` - Região da AWS (ex: us-east-1)
 
-4. Aplique a infraestrutura:
-   ```bash
-   terraform apply
-   ```
+### Terraform Backend
+- `TF_VAR_backend_bucket` - Nome do bucket S3 para armazenar o estado do Terraform
+- `TF_VAR_backend_key` - Chave do arquivo de estado no bucket S3
+- `TF_VAR_backend_region` - Região do bucket S3
 
-## Pré-requisitos
+### RDS (apenas para workflow RDS)
+- `TF_VAR_db_password` - Senha do banco de dados PostgreSQL
+- `TF_VAR_db_username` - Usuário do banco de dados PostgreSQL
 
-- Terraform instalado
-- AWS CLI configurado
-- Bucket S3 para backend (configurado em cada módulo)
+## Configuração das Secrets
+
+1. Acesse o repositório no GitHub
+2. Vá em **Settings** > **Secrets and variables** > **Actions**
+3. Clique em **New repository secret**
+4. Adicione cada secret listada acima com seus respectivos valores
+
+## Ordem de Deploy
+
+1. **RDS**: Deploy primeiro para criar o banco de dados
+2. **EKS**: Deploy depois para criar o cluster Kubernetes
+
+Os workflows são independentes e podem ser executados separadamente conforme necessário. 
