@@ -3,7 +3,8 @@ name: 'EKS Terraform workflow'
 on:
   push:
     branches:
-      - rds
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
